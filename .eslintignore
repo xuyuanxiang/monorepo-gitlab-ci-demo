@@ -1,0 +1,7 @@
+node_modules
+packages/example
+packages/*/types
+packages/*/lib
+packages/*/public
+setupTests.js
+fileTransformer.js

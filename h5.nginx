@@ -1,0 +1,21 @@
+server {
+  listen 80;
+  root /usr/share/nginx/html;
+  server_name localhost;
+  index index.html;
+  charset utf-8;
+  access_log  /var/log/nginx/access.log  main;
+
+  location /ping {
+    add_header Content-Type "text/plain;charset=utf-8";
+    return 200 "success";
+  }
+
+  location /example {
+    try_files $uri $uri/ /example.html;
+  }
+
+  location /iframe {
+    try_files $uri $uri/ /iframe.html;
+  }
+}
