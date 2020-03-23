@@ -1,4 +1,3 @@
-/* eslint-disable */
 const { writeFile } = require('fs');
 const conventionalChangelog = require('conventional-changelog');
 

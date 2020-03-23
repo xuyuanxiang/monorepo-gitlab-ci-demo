@@ -1,4 +1,3 @@
-/* eslint-disable */
 const { spawn } = require('child_process');
 const { EOL } = require('os');
 const https = require('https');
