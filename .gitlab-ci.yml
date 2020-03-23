@@ -129,17 +129,18 @@ job-build:
     changes:
       - packages/*/src/**/*
 
-# 这一步自由发挥比如：Server Less引擎，K8S...
+# 自由发挥。
+# 结合公司情况，这里是构建 Docker 镜像，然后推送到私有仓库
 job-deploy:
   dependencies:
     - job-build
   stage: deploy
   script:
-    # TODO: Docker仓库地址填写为实际Docker hub部署域名，比如：localhost:5000
+    # TODO: Docker 仓库地址改为实际域名，比如：localhost:5000
     - docker build -t localhost:5000/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA} .
     - docker push localhost:5000/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}
-  # tags:
-  #  - # TODO: 安装并注册使用 Shell Executor 的 Runner，填写 Runner 的 tag 名
+  tags:
+    - shell
   only:
     refs:
       - master
