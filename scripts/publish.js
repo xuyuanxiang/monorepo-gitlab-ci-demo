@@ -7,9 +7,9 @@ const {
   publishConfig: { registry },
 } = require('../packages/components/package.json');
 
-const USER = process.env.NPM_USER;
-const PWD = process.env.NPM_PASSWORD;
-const EMAIL = process.env.NPM_BASE64_EMAIL ? Buffer.from(process.env.WS_NPM_BASE64_EMAIL, 'base64').toString() : '';
+const USER = process.env.MY_NPM_USER;
+const PWD = process.env.MY_NPM_PASSWORD;
+const EMAIL = process.env.MY_NPM_BASE64_EMAIL ? Buffer.from(process.env.WS_NPM_BASE64_EMAIL, 'base64').toString() : '';
 
 function getLatestVersion() {
   return new Promise(resolve => {
@@ -88,13 +88,13 @@ function prePublish(branch) {
 
 function npmLogin() {
   if (!USER) {
-    throw new Error(`Required environment variable: "NPM_USER" was not present.`);
+    throw new Error(`Required environment variable: "MY_NPM_USER" was not present.`);
   }
   if (!PWD) {
-    throw new Error(`Required environment variable: "NPM_PASSWORD" was not present.`);
+    throw new Error(`Required environment variable: "MY_NPM_PASSWORD" was not present.`);
   }
   if (!EMAIL) {
-    throw new Error(`Required environment variable: "NPM_BASE64_EMAIL" was not present.`);
+    throw new Error(`Required environment variable: "MY_NPM_BASE64_EMAIL" was not present.`);
   }
 
   const npmLogin = spawn('npm', ['login', '-registry', registry]);
@@ -124,12 +124,12 @@ function npmLogin() {
   npmLogin.on('close', code => {
     clearTimeout(timer);
     if (code === 0) {
-      if (process.env.WS_SOURCE_BRANCH) {
-        console.info(`publish - merge request source branch=${process.env.WS_SOURCE_BRANCH}`);
-        publish(process.env.WS_SOURCE_BRANCH);
-      } else if (process.env.WS_CURRENT_BRANCH) {
-        console.info(`prepublish - commit branch=${process.env.WS_CURRENT_BRANCH}`);
-        prePublish(process.env.WS_CURRENT_BRANCH);
+      if (process.env.MY_SOURCE_BRANCH) {
+        console.info(`publish - merge request source branch=${process.env.MY_SOURCE_BRANCH}`);
+        publish(process.env.MY_SOURCE_BRANCH);
+      } else if (process.env.MY_CURRENT_BRANCH) {
+        console.info(`prepublish - commit branch=${process.env.MY_CURRENT_BRANCH}`);
+        prePublish(process.env.MY_CURRENT_BRANCH);
       } else {
         lernaPublish('from-package');
       }

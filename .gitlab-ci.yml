@@ -1,0 +1,122 @@
+image: node:lts
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+  policy: pull-push
+
+stages:
+  - test
+  - publish
+  - build
+  - deploy
+
+job-prepublish:
+  stage: publish
+  script:
+    # TODO: Add GitLab Deploy Key: MY_SSH_PRIVATE_KEY
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$MY_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # TODO: replace $MY_GIT_HOST_NAME to GitLab's hostname
+    - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh git@$MY_GIT_HOST_NAME
+    # TODO: git config global user.name and user.email
+    # TODO: git clone
+    - cd $CI_PROJECT_NAME
+    # TODO: git remote set-url origin
+    - git checkout -b $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
+    - yarn
+    - yarn test --ci
+    - yarn compile
+    - MY_CURRENT_BRANCH=$CI_COMMIT_BRANCH yarn release
+  # tags:
+  #  - # TODO: install GitLab Runner with Docker Executor
+  only:
+    refs:
+      - branches
+    variables:
+      - $CI_COMMIT_BRANCH =~ /^(feature|hotfix)\/.+/
+    changes:
+      - packages/*/src/**/*
+
+job-test:
+  stage: test
+  script:
+    - yarn
+    - yarn test --ci
+  # tags:
+  #  - # TODO: install GitLab Runner with Docker Executor
+  only:
+    - merge_requests
+
+job-publish:
+  dependencies:
+    - test
+  stage: publish
+  script:
+    # TODO: Add GitLab Deploy Key: MY_SSH_PRIVATE_KEY
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$MY_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # TODO: replace $MY_GIT_HOST_NAME to GitLab's hostname
+    - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh git@$MY_GIT_HOST_NAME
+    # TODO: git config global user.name and user.email
+    # TODO: git clone
+    - cd $CI_PROJECT_NAME
+    # TODO: git remote set-url origin
+    - git checkout -b $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    - yarn
+    - yarn compile
+    - MY_SOURCE_BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME yarn release
+  # tags:
+  #  - # TODO: install GitLab Runner with Docker Executor
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - packages/*/src/**/*
+
+job-build:
+  stage: build
+  coverage: '/\sAll files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    paths:
+      - public
+    expire_in: 15 mins
+  script:
+    - yarn
+    - yarn test --ci
+    - yarn gen:changelog
+    - yarn build
+  # tags:
+  #  - # TODO: install GitLab Runner with Docker Executor
+  only:
+    refs:
+      - master
+    changes:
+      - packages/*/src/**/*
+
+job-deploy:
+  dependencies:
+    - job-build
+  stage: deploy
+  script:
+    # TODO: private docker registry: MY_DOCKER_HUB_REGISTRY
+    - docker build -t ${MY_DOCKER_HUB_REGISTRY}/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA} .
+    - docker push ${MY_DOCKER_HUB_REGISTRY}/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}
+  # tags:
+  #  - # TODO: install GitLab Runner with Shell Executor
+  only:
+    refs:
+      - master
+    changes:
+      - packages/*/src/**/*
