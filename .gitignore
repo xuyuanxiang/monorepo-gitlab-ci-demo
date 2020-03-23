@@ -154,7 +154,4 @@ yarn.lock
 
 /package-manifest.json
 tsconfig.tsbuildinfo
-storybook-static
 public
-CHANGELOG.md
-Changelog.stories.mdx

@@ -11,10 +11,6 @@ server {
     return 200 "success";
   }
 
-  location /example {
-    try_files $uri $uri/ /example.html;
-  }
-
   location /iframe {
     try_files $uri $uri/ /iframe.html;
   }

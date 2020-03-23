@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Button/> should render default props 1`] = `
+.c0 {
+  max-width: 100%;
+  padding: 0 16px;
+  border-radius: 4px;
+  outline: none;
+  font-size: 18px;
+  height: 48px;
+  line-height: 48px;
+  font-weight: 500;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  white-space: nowrap;
+  background: #ffffff;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  touch-action: none;
+  vertical-align: text-top;
+}
+
+.c0.secondary {
+  border: 1px solid #d9af5c;
+  color: #d9af5c;
+}
+
+.c0.secondary:active {
+  background: #fbf7ee;
+}
+
+.c0.primary {
+  border: 0;
+  background: #d9af5c;
+  color: #ffffff;
+}
+
+.c0.primary:active {
+  background: #cd962e;
+}
+
+.c0.negative {
+  border: 1px solid #d23f31;
+  color: #d23f31;
+}
+
+.c0.negative:active {
+  background: #fff3f2;
+}
+
+.c0:disabled {
+  background: #cccccc;
+  color: #ffffff;
+  border: 0;
+}
+
+.c0.standard {
+  display: block;
+  width: 100%;
+}
+
+.c0.small {
+  font-size: 13px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 8.5px;
+}
+
+<button
+  class="c0 primary standard"
+/>
+`;

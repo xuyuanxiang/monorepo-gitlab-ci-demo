@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import styled from 'styled-components';
 import { IButtonProps } from './prop-types';
@@ -68,7 +68,7 @@ export function Button({
   spec = 'standard',
   className,
   ...buttonProps
-}: PropsWithChildren<IButtonProps>): JSX.Element {
+}: IButtonProps): JSX.Element {
   return (
     <StyledButton className={clsx(scene, spec, className)} {...buttonProps}>
       {children}
