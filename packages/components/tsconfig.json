@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "jsx": "react",
+    "rootDir": "src",
+    "outDir": "lib",
+    "plugins": [
+      {
+        "transform": "typescript-plugin-styled-components",
+        "type": "config",
+        "ssr": false
+      }
+    ]
+  }
+}
