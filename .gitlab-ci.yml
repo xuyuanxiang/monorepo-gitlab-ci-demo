@@ -15,27 +15,31 @@ stages:
 job-prepublish:
   stage: publish
   script:
-    # TODO: Add GitLab Deploy Key: MY_SSH_PRIVATE_KEY
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
-    - echo "$MY_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    # TODO: 创建ssh key，公钥添加到 GitLab Deploy Key；私钥存到 GitLab Environment Variable并命名为： SSH_PRIVATE_KEY。
+    # - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    # TODO: replace $MY_GIT_HOST_NAME to GitLab's hostname
-    - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
+    # TODO: 将下面的 $MY_GIT_HOST_NAME 替换为 GitLab 域名，比如：git.my-domain.com
+    # - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - ssh git@$MY_GIT_HOST_NAME
-    # TODO: git config global user.name and user.email
-    # TODO: git clone
-    - cd $CI_PROJECT_NAME
-    # TODO: git remote set-url origin
+    # - ssh git@$MY_GIT_HOST_NAME
+    # TODO: 设置邮箱（和创建SSH key的邮箱地址保持一致：ssh-keygen -t rsa -b 4096 -C "这里改成邮箱地址，随便填，不需要校验"）
+    # - git config --global user.email "这里改成邮箱地址，随便填，不需要校验"
+    - git config --global user.name "$GITLAB_USER_NAME"
+    # TODO: 将项目重新克隆：
+    # - git clone git@替换为实际域名/替换为实际的组/替换为实际的工程名.git
+    # - cd 替换为实际的工程名
+    # TODO: 重新这是远程仓库地址：
+    # - git remote set-url origin git@替换为实际域名/替换为实际的组/替换为实际的工程名.git
     - git checkout -b $CI_COMMIT_BRANCH origin/$CI_COMMIT_BRANCH
     - yarn
     - yarn test --ci
     - yarn compile
     - MY_CURRENT_BRANCH=$CI_COMMIT_BRANCH yarn release
   # tags:
-  #  - # TODO: install GitLab Runner with Docker Executor
+  #  - # TODO: 安装并注册使用 Docker Executor 的 Runner，填写 Runner 的 tag 名
   only:
     refs:
       - branches
@@ -59,26 +63,30 @@ job-publish:
     - test
   stage: publish
   script:
-    # TODO: Add GitLab Deploy Key: MY_SSH_PRIVATE_KEY
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
-    - echo "$MY_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    # TODO: 创建ssh key，公钥添加到 GitLab Deploy Key；私钥存到 GitLab Environment Variable并命名为： SSH_PRIVATE_KEY。
+    # - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    # TODO: replace $MY_GIT_HOST_NAME to GitLab's hostname
-    - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
+    # TODO: 将下面的 $MY_GIT_HOST_NAME 替换为 GitLab 域名，比如：git.my-domain.com
+    # - ssh-keyscan $MY_GIT_HOST_NAME >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - ssh git@$MY_GIT_HOST_NAME
-    # TODO: git config global user.name and user.email
-    # TODO: git clone
-    - cd $CI_PROJECT_NAME
-    # TODO: git remote set-url origin
+    # - ssh git@$MY_GIT_HOST_NAME
+    # TODO: 设置邮箱（和创建SSH key的邮箱地址保持一致：ssh-keygen -t rsa -b 4096 -C "这里改成邮箱地址，随便填，不需要校验"）
+    # - git config --global user.email "这里改成邮箱地址，随便填，不需要校验"
+    - git config --global user.name "$GITLAB_USER_NAME"
+    # TODO: 将项目重新克隆：
+    # - git clone git@替换为实际域名/替换为实际的组/替换为实际的工程名.git
+    # - cd 替换为实际的工程名
+    # TODO: 重新这是远程仓库地址：
+    # - git remote set-url origin git@替换为实际域名/替换为实际的组/替换为实际的工程名.git
     - git checkout -b $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME origin/$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
     - yarn
     - yarn compile
     - MY_SOURCE_BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME yarn release
   # tags:
-  #  - # TODO: install GitLab Runner with Docker Executor
+  #  - # TODO: 安装并注册使用 Docker Executor 的 Runner，填写 Runner 的 tag 名
   only:
     refs:
       - merge_requests
@@ -98,23 +106,24 @@ job-build:
     - yarn gen:changelog
     - yarn build
   # tags:
-  #  - # TODO: install GitLab Runner with Docker Executor
+  #  - # TODO: 安装并注册使用 Docker Executor 的 Runner，填写 Runner 的 tag 名
   only:
     refs:
       - master
     changes:
       - packages/*/src/**/*
 
+# 这一步自由发挥比如：Server Less引擎，K8S...
 job-deploy:
   dependencies:
     - job-build
   stage: deploy
   script:
-    # TODO: private docker registry: MY_DOCKER_HUB_REGISTRY
-    - docker build -t ${MY_DOCKER_HUB_REGISTRY}/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA} .
-    - docker push ${MY_DOCKER_HUB_REGISTRY}/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}
+    # TODO: Docker仓库地址填写为实际Docker hub部署域名，比如：localhost:5000
+    - docker build -t localhost:5000/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA} .
+    - docker push localhost:5000/${CI_PROJECT_NAME}-${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}
   # tags:
-  #  - # TODO: install GitLab Runner with Shell Executor
+  #  - # TODO: 安装并注册使用 Shell Executor 的 Runner，填写 Runner 的 tag 名
   only:
     refs:
       - master
