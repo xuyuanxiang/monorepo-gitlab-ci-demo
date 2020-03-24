@@ -6,19 +6,13 @@ module.exports = ({ config }) => {
     {
       test: /\.[tj]sx?$/,
       exclude: [/node_modules/],
-      use: [
-        {
-          loader: require.resolve('babel-loader'),
-        },
-      ],
+      use: [require.resolve('babel-loader'), require.resolve('react-docgen-typescript-loader')],
     },
     {
       test: /\.mdx$/,
       exclude: [/node_modules/],
       use: [
-        {
-          loader: require.resolve('babel-loader'),
-        },
+        require.resolve('babel-loader'),
         {
           loader: require.resolve('@mdx-js/loader'),
           options: {
